@@ -1,4 +1,4 @@
-// 📦 Загрузка рецептов из Google Таблицы (разделитель: ;)
+// 📦 Загрузка рецептов из Google Таблицы
 
 let RECIPES = [];
 
@@ -12,18 +12,14 @@ async function loadRecipesFromCloud() {
         const recipes = [];
         const lines = text.split('\n').filter(l => l.trim());
         
-        // Пропускаем заголовок (строка 0)
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
             if (!line) continue;
             
-            // Разбиваем по ТОЧКЕ С ЗАПЯТОЙ
             const parts = line.split(';');
             
-            console.log(`📝 Строка ${i}: ${parts.length} полей`);
-            
             if (parts.length >= 9) {
-                // Ингредиенты уже разделены точкой с запятой
+                // Ингредиенты
                 const ingredients = [];
                 for (let j = 7; j < parts.length - 1; j++) {
                     if (parts[j].trim()) {
@@ -31,11 +27,12 @@ async function loadRecipesFromCloud() {
                     }
                 }
                 
-                // Инструкции разделяем по точке
+                // Инструкции - исправленный парсер
                 const instructionsRaw = parts[parts.length - 1] || '';
                 const instructions = instructionsRaw
-                    .split(/\d+\.\s*/)
-                    .filter(s => s.trim())
+                    .replace(/,+/g, '')  // Убираем запятые
+                    .split(/\d+\.\s*/)   // Разделяем по "1." "2." и т.д.
+                    .filter(s => s.trim() && s.length > 5)
                     .map(s => s.trim());
                 
                 recipes.push({
@@ -51,7 +48,7 @@ async function loadRecipesFromCloud() {
                 });
                 
                 console.log('✅ Рецепт:', recipes[recipes.length - 1].name);
-                console.log('   Ингредиенты:', ingredients);
+                console.log('   Инструкции:', instructions);
             }
         }
         
