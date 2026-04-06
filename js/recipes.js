@@ -65,14 +65,35 @@ async function loadRecipesFromCloud() {
                 const ingredients = [];
                 const instructions = [];
                 
+                // Слова которые нужно исключить из ингредиентов
+                const excludeWords = [
+                    'universal', 'meat', 'vegetarian', 'vegan', 'fish', 'light',
+                    'family', 'kids', 'adults', 'quick', 'russian', 'italian',
+                    'asian', 'european', 'american', 'georgian', 'french',
+                    'thai', 'japanese', 'chinese', 'indian', 'mexican'
+                ];
+                
                 for (let j = 4; j < parts.length; j++) {
                     const part = parts[j].trim();
                     if (!part) continue;
                     
+                    // Пропускаем ссылки
+                    if (part.includes('http') || part.includes('www.')) {
+                        continue;
+                    }
+                    
+                    // Пропускаем служебные слова
+                    if (excludeWords.includes(part.toLowerCase())) {
+                        continue;
+                    }
+                    
                     if (part.match(/^\d+\./)) {
                         instructions.push(part);
                     } else {
-                        ingredients.push(part);
+                        // Добавляем только если это не мусор
+                        if (part.length > 1 && !part.includes('|')) {
+                            ingredients.push(part);
+                        }
                     }
                 }
                 
@@ -81,9 +102,9 @@ async function loadRecipesFromCloud() {
                     name: name || 'Без названия',
                     time: time,
                     image: image,
-                    cuisine: 'universal',
-                    dietType: 'meat',
-                    forWhom: ['family'],
+                    cuisine: 'универсальная',
+                    dietType: 'мясное',
+                    forWhom: ['для всех'],
                     ingredients: ingredients,
                     instructions: instructions
                 };
