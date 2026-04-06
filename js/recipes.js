@@ -1,65 +1,81 @@
-// 📦 Загрузка рецептов из Google Таблицы
+// 📦 Загрузка рецептов (с диагностикой)
 
 let RECIPES = [];
 
 async function loadRecipesFromCloud() {
     try {
-        console.log('🔄 Загрузка...');
+        console.log('🔄 НАЧИНАЕМ ЗАГРУЗКУ...');
+        console.log('📋 URL:', CONFIG.googleSheetUrl);
         
         const response = await fetch(CONFIG.googleSheetUrl);
+        console.log('📊 Статус:', response.status);
+        
+        if (!response.ok) {
+            throw new Error('HTTP error: ' + response.status);
+        }
+        
         const text = await response.text();
+        console.log('📄 Получено символов:', text.length);
+        console.log('📋 Первые 500 символов:', text.substring(0, 500));
+        
+        const lines = text.split('\n').filter(l => l.trim());
+        console.log('📊 Всего строк:', lines.length);
         
         const recipes = [];
-        const lines = text.split('\n').filter(l => l.trim());
         
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
-            if (!line) continue;
+            if (!line || line.startsWith('id')) continue;
             
-            const parts = line.split(';');
+            const parts = line.split(',');
+            console.log(`Строка ${i}: ${parts.length} полей`);
             
-            if (parts.length >= 9) {
-                // Ингредиенты
+            if (parts.length >= 5) {
+                const instructions = [];
                 const ingredients = [];
-                for (let j = 7; j < parts.length - 1; j++) {
-                    if (parts[j].trim()) {
-                        ingredients.push(parts[j].trim());
+                
+                for (let j = 4; j < parts.length; j++) {
+                    const part = parts[j].trim();
+                    if (part.match(/^\d+\./)) {
+                        instructions.push(part);
+                    } else if (part && part.length > 2) {
+                        ingredients.push(part);
                     }
                 }
                 
-                // Инструкции - исправленный парсер
-                const instructionsRaw = parts[parts.length - 1] || '';
-                const instructions = instructionsRaw
-                    .replace(/,+/g, '')  // Убираем запятые
-                    .split(/\d+\.\s*/)   // Разделяем по "1." "2." и т.д.
-                    .filter(s => s.trim() && s.length > 5)
-                    .map(s => s.trim());
-                
-                recipes.push({
+                const recipe = {
                     id: parseInt(parts[0]) || i,
                     name: parts[1] || 'Без названия',
                     time: parseInt(parts[2]) || 30,
                     image: parts[3] || '',
-                    cuisine: parts[4] || 'universal',
-                    dietType: parts[5] || 'meat',
-                    forWhom: (parts[6] || 'family').split('|').map(s => s.trim()),
+                    cuisine: 'universal',
+                    dietType: 'meat',
+                    forWhom: ['family'],
                     ingredients: ingredients,
                     instructions: instructions
-                });
+                };
                 
-                console.log('✅ Рецепт:', recipes[recipes.length - 1].name);
-                console.log('   Инструкции:', instructions);
+                recipes.push(recipe);
+                if (recipes.length <= 3) {
+                    console.log('✅ Загружен:', recipe.name);
+                }
             }
         }
         
         RECIPES = recipes;
-        console.log('✅ Загружено рецептов:', RECIPES.length);
+        console.log('✅✅✅ ВСЕГО РЕЦЕПТОВ:', RECIPES.length);
+        
+        if (RECIPES.length === 0) {
+            console.error('❌ ВНИМАНИЕ: Рецепты не загружены!');
+            console.error('💡 Проверьте: 1) Доступ к таблице 2) Формат CSV');
+        }
+        
         return RECIPES.length > 0;
         
     } catch (e) {
-        console.error('❌ Ошибка:', e);
+        console.error('❌ КРИТИЧЕСКАЯ ОШИБКА:', e);
         return false;
     }
 }
 
-console.log('✅ Модуль готов');
+console.log('✅ Модуль recipes.js загружен');
