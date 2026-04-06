@@ -5,249 +5,163 @@
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #e0f2f1 0%, #f5f5f5 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     padding: 20px;
 }
 
 .container {
-    max-width: 1000px;
+    max-width: 900px;
     margin: 0 auto;
-}
-
-h1 {
-    text-align: center;
-    color: #2e7d32;
-    margin-bottom: 30px;
-    font-size: 36px;
-}
-
-.search-box {
     background: white;
     border-radius: 20px;
     padding: 30px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+}
+
+.header {
+    text-align: center;
     margin-bottom: 30px;
 }
 
-.section {
-    margin-bottom: 25px;
-    padding-bottom: 25px;
-    border-bottom: 1px solid #e0e0e0;
+.header h1 {
+    color: #2d3748;
+    font-size: 2.5em;
 }
 
-.section:last-child {
-    border-bottom: none;
-    margin-bottom: 0;
-}
-
-.section-title {
-    font-size: 18px;
-    font-weight: 600;
-    color: #424242;
-    margin-bottom: 12px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.ingredients-input {
-    width: 100%;
-    min-height: 120px;
-    padding: 16px;
-    border: 2px solid #e0e0e0;
+.search-section,
+.filters-section,
+.exclude-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f7fafc;
     border-radius: 12px;
+}
+
+h2 {
+    color: #2d3748;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+}
+
+textarea {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
     font-size: 16px;
     resize: vertical;
+    min-height: 80px;
     transition: border-color 0.3s;
-    font-family: inherit;
 }
 
-.ingredients-input:focus {
+textarea:focus {
     outline: none;
-    border-color: #4caf50;
+    border-color: #667eea;
 }
 
 .voice-btn {
-    background: #2196f3;
+    margin-top: 10px;
+    padding: 12px 24px;
+    background: #4299e1;
     color: white;
     border: none;
-    padding: 12px 20px;
-    border-radius: 10px;
+    border-radius: 8px;
+    font-size: 16px;
     cursor: pointer;
-    font-size: 15px;
-    margin-top: 10px;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
     transition: background 0.3s;
 }
 
 .voice-btn:hover {
-    background: #1976d2;
+    background: #3182ce;
 }
 
-.voice-btn.recording {
-    background: #f44336;
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
-
-/* Стили для фильтров */
 .filters-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
+    gap: 15px;
 }
 
-.filter-group {
-    margin-bottom: 12px;
-}
-
-.filter-group label {
+.filter-item label {
     display: block;
-    margin-bottom: 6px;
-    color: #616161;
-    font-size: 14px;
+    margin-bottom: 5px;
+    color: #4a5568;
     font-weight: 500;
 }
 
-.filter-group select {
+.filter-item select {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 10px;
+    padding: 10px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
     font-size: 15px;
-    background: white;
     cursor: pointer;
 }
 
-.filter-group select:focus {
-    outline: none;
-    border-color: #4caf50;
-}
-
-.search-btn {
+.search-button {
     width: 100%;
     padding: 18px;
-    background: linear-gradient(135deg, #4caf50 0%, #66bb6a 100%);
+    background: #48bb78;
     color: white;
     border: none;
     border-radius: 12px;
     font-size: 18px;
-    font-weight: 600;
+    font-weight: bold;
     cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    margin-top: 10px;
+    transition: background 0.3s, transform 0.2s;
 }
 
-.search-btn:hover {
+.search-button:hover {
+    background: #38a169;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
 }
 
 .results {
-    display: grid;
-    gap: 24px;
+    margin-top: 30px;
 }
 
 .recipe-card {
-    background: white;
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-    transition: transform 0.3s;
-}
-
-.recipe-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.15);
-}
-
-.recipe-image {
-    width: 100%;
-    height: 280px;
-    object-fit: cover;
-    background: #f5f5f5;
-}
-
-.recipe-content {
-    padding: 24px;
-}
-
-.recipe-content h3 {
-    color: #2e7d32;
-    margin-bottom: 8px;
-    font-size: 20px;
-}
-
-.recipe-content p {
-    color: #757575;
-    margin-bottom: 8px;
-    font-size: 14px;
-}
-
-.stats {
-    background: #e8f5e9;
-    padding: 16px;
-    border-radius: 10px;
+    background: #f7fafc;
+    border-radius: 12px;
+    padding: 20px;
     margin-bottom: 20px;
-    text-align: center;
-    color: #2e7d32;
-    font-weight: 600;
+    border-left: 4px solid #48bb78;
 }
 
-.status {
-    display: inline-block;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
+.recipe-card h3 {
+    color: #2d3748;
+    margin-bottom: 10px;
+    font-size: 1.4em;
 }
 
-.status.complete {
-    background: #c8e6c9;
-    color: #2e7d32;
-}
-
-.status.partial {
-    background: #fff9c4;
-    color: #f57f17;
-}
-
-details {
-    margin-top: 16px;
-}
-
-summary {
-    cursor: pointer;
-    color: #1976d2;
-    font-weight: 600;
-    padding: 8px 0;
-}
-
-summary:hover {
-    color: #1565c0;
-}
-
-ol {
-    padding-left: 20px;
-    margin-top: 10px;
-}
-
-li {
-    margin-bottom: 8px;
-    color: #424242;
+.recipe-card p {
+    color: #4a5568;
+    margin: 8px 0;
     line-height: 1.6;
 }
 
-.loading {
+.recipe-card strong {
+    color: #2d3748;
+}
+
+.empty-message {
     text-align: center;
     padding: 40px;
-    color: #757575;
+    color: #718096;
+    font-size: 1.1em;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+    }
+    
+    .header h1 {
+        font-size: 1.8em;
+    }
+    
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
 }
