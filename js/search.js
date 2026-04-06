@@ -1,35 +1,28 @@
-// 🔍 Поиск рецептов (улучшенный)
+// 🔍 Поиск рецептов
 
 const Search = {
     find(ingredients, filters) {
-        // Разделяем по запятым, пробелам, точкам с запятой
         const userIngredients = ingredients
             .toLowerCase()
-            .split(/[,\s;]+/)  // Запятая, пробел, точка с запятой
-            .filter(i => i.length >= 2);  // Минимум 2 буквы
+            .replace(/[.,;]/g, ' ')
+            .split(/\s+/)
+            .filter(i => i.length >= 2 && !['и', 'в', 'на', 'с', 'к', 'по'].includes(i));
         
         const excludeIngredients = (filters.exclude || '')
             .toLowerCase()
-            .split(/[,\s;]+/)
+            .replace(/[.,;]/g, ' ')
+            .split(/\s+/)
             .filter(i => i.length >= 2);
         
-        console.log('🔍 Поиск по ингредиентам:', userIngredients);
+        console.log('🔍 Ищем:', userIngredients);
         console.log('❌ Исключить:', excludeIngredients);
         
-        const results = RECIPES.filter(recipe => {
-            // Фильтр по времени
+        const results = window.RECIPES.filter(recipe => {
             if (recipe.time > filters.maxTime) return false;
-            
-            // Фильтр по кухне
             if (filters.cuisine !== 'all' && recipe.cuisine !== filters.cuisine) return false;
-            
-            // Фильтр по типу питания
             if (filters.dietType !== 'all' && recipe.dietType !== filters.dietType) return false;
-            
-            // Фильтр по категории
             if (filters.forWhom !== 'all' && !recipe.forWhom.includes(filters.forWhom)) return false;
             
-            // Проверка на исключаемые ингредиенты
             if (excludeIngredients.length > 0) {
                 const hasExcluded = recipe.ingredients.some(ing => 
                     excludeIngredients.some(exc => ing.toLowerCase().includes(exc))
@@ -37,36 +30,37 @@ const Search = {
                 if (hasExcluded) return false;
             }
             
-            // Подсчёт совпадений по ингредиентам
-            const matchCount = recipe.ingredients.filter(ing => 
-                userIngredients.some(user => 
-                    ing.toLowerCase().includes(user) || user.includes(ing.toLowerCase())
-                )
+            const recipeIngr = recipe.ingredients.map(i => i.toLowerCase());
+            
+            const matchCount = userIngredients.filter(user => 
+                recipeIngr.some(ing => ing.includes(user) || user.includes(ing))
             ).length;
             
-            const matchPercent = (matchCount / recipe.ingredients.length) * 100;
-            return matchPercent >= CONFIG.minMatchPercent;
+            return matchCount > 0;
         }).map(recipe => {
+            const recipeIngr = recipe.ingredients.map(i => i.toLowerCase());
+            
             const has = recipe.ingredients.filter(ing => 
                 userIngredients.some(user => 
-                    ing.toLowerCase().includes(user) || user.includes(ing.toLowerCase())
+                    ing.includes(user) || user.includes(ing)
                 )
             );
+            
             const missing = recipe.ingredients.filter(ing => 
                 !userIngredients.some(user => 
-                    ing.toLowerCase().includes(user) || user.includes(ing.toLowerCase())
+                    ing.includes(user) || user.includes(ing)
                 )
             );
-            return { 
-                ...recipe, 
-                has, 
-                missing, 
-                matchPercent: (has.length / recipe.ingredients.length) * 100 
-            };
+            
+            const matchPercent = recipe.ingredients.length > 0 
+                ? (has.length / recipe.ingredients.length) * 100 
+                : 0;
+            
+            return { ...recipe, has, missing, matchPercent };
         });
         
         results.sort((a, b) => b.matchPercent - a.matchPercent);
-        console.log('✅ Найдено рецептов:', results.length);
+        console.log('✅ Найдено:', results.length);
         return results;
     }
 };
