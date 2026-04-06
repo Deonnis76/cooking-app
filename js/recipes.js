@@ -20,7 +20,7 @@ async function loadRecipesFromCloud() {
         
         window.RECIPES = [];
         
-        // Красивые картинки для еды
+        // Красивые картинки
         const foodImages = [
             'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400',
             'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400',
@@ -30,6 +30,18 @@ async function loadRecipesFromCloud() {
             'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400',
             'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400',
             'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'
+        ];
+        
+        // Слова которые нужно убрать
+        const excludeWords = [
+            'universal', 'meat', 'vegetarian', 'vegan', 'fish', 'light',
+            'family', 'kids', 'adults', 'quick', 'russian', 'italian',
+            'asian', 'european', 'american', 'georgian', 'french',
+            'thai', 'japanese', 'chinese', 'indian', 'mexican',
+            'индийская', 'итальянская', 'русская', 'французская',
+            'азиатская', 'европейская', 'американская', 'грузинская',
+            'тайская', 'японская', 'китайская', 'мексиканская',
+            'турецкая', 'узбекская', 'украинская', 'белорусская'
         ];
         
         for (let i = 1; i < lines.length; i++) {
@@ -46,7 +58,7 @@ async function loadRecipesFromCloud() {
                 const name = parts[1].trim();
                 const time = parseInt(parts[2]) || 30;
                 
-                // Картинка из столбца D (индекс 3)
+                // Картинка из столбца D
                 let image = '';
                 if (parts.length > 3) {
                     image = parts[3].trim();
@@ -55,26 +67,16 @@ async function loadRecipesFromCloud() {
                     }
                 }
                 
-                // Если картинки нет - берем случайную
                 if (!image) {
                     const randomIndex = (parseInt(id) || i) % foodImages.length;
                     image = foodImages[randomIndex];
                 }
                 
-                // Ингредиенты и инструкции (начинаем с индекса 4)
                 const ingredients = [];
                 const instructions = [];
                 
-                // Слова которые нужно исключить из ингредиентов
-                const excludeWords = [
-                    'universal', 'meat', 'vegetarian', 'vegan', 'fish', 'light',
-                    'family', 'kids', 'adults', 'quick', 'russian', 'italian',
-                    'asian', 'european', 'american', 'georgian', 'french',
-                    'thai', 'japanese', 'chinese', 'indian', 'mexican'
-                ];
-                
                 for (let j = 4; j < parts.length; j++) {
-                    const part = parts[j].trim();
+                    let part = parts[j].trim();
                     if (!part) continue;
                     
                     // Пропускаем ссылки
@@ -87,13 +89,23 @@ async function loadRecipesFromCloud() {
                         continue;
                     }
                     
+                    // Пропускаем если содержит |
+                    if (part.includes('|')) {
+                        continue;
+                    }
+                    
+                    // Пропускаем короткие слова (меньше 2 букв)
+                    if (part.length < 2) {
+                        continue;
+                    }
+                    
+                    // Убираем кавычки
+                    part = part.replace(/"/g, '').trim();
+                    
                     if (part.match(/^\d+\./)) {
                         instructions.push(part);
                     } else {
-                        // Добавляем только если это не мусор
-                        if (part.length > 1 && !part.includes('|')) {
-                            ingredients.push(part);
-                        }
+                        ingredients.push(part);
                     }
                 }
                 
@@ -117,9 +129,9 @@ async function loadRecipesFromCloud() {
         return window.RECIPES.length > 0;
         
     } catch (error) {
-        console.error('❌ Ошибка загрузки:', error);
+        console.error('❌ Ошибка:', error);
         return false;
     }
 }
 
-console.log('✅ Модуль recipes.js готов');
+console.log('✅ recipes.js готов');
