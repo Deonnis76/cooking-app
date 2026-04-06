@@ -1,96 +1,79 @@
-// 🎤 Голосовой ввод (улучшенный)
+// 🎤 Голосовой ввод
 
 const VoiceInput = {
-    recognition: null,
-    isRecording: false,
-    
-    init(buttonId, inputId) {
-        const btn = document.getElementById(buttonId);
-        if (!btn) return;
+    init() {
+        const voiceBtn = document.getElementById('voiceBtn');
+        const ingredientsInput = document.getElementById('ingredientsInput');
         
-        if (!('webkitSpeechRecognition' in window)) {
-            btn.style.display = 'none';
-            console.warn('⚠️ Голосовой ввод не поддерживается в этом браузере');
+        if (!voiceBtn || !ingredientsInput) {
+            console.log('⚠️ Элементы голосового ввода не найдены');
+            return;
+        }
+        
+        // Проверяем поддержку
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            voiceBtn.disabled = true;
+            voiceBtn.textContent = '🎤 Голосовой ввод не поддерживается';
+            console.log('⚠️ Голосовой ввод не поддерживается браузером');
             return;
         }
         
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        this.recognition = new SpeechRecognition();
-        this.recognition.lang = 'ru-RU';
-        this.recognition.continuous = true;  // Продолжительный режим
-        this.recognition.interimResults = false;
-        this.inputId = inputId;
+        const recognition = new SpeechRecognition();
         
-        let finalTranscript = '';
+        recognition.lang = 'ru-RU';
+        recognition.continuous = false;
+        recognition.interimResults = false;
         
-        btn.onclick = () => this.toggle();
-        
-        this.recognition.onstart = () => {
-            console.log('🎤 Запись началась...');
-        };
-        
-        this.recognition.onresult = (e) => {
-            for (let i = e.resultIndex; i < e.results.length; i++) {
-                const transcript = e.results[i][0].transcript;
-                if (e.results[i].isFinal) {
-                    finalTranscript += (finalTranscript ? ', ' : '') + transcript;
-                }
-            }
-            const input = document.getElementById(this.inputId);
-            input.value = finalTranscript;
-        };
-        
-        this.recognition.onerror = (e) => {
-            console.warn('⚠️ Ошибка голосового ввода:', e.error);
-        };
-        
-        this.recognition.onend = () => {
-            if (this.isRecording) {
-                // Перезапуск если всё ещё записываем
-                try {
-                    this.recognition.start();
-                } catch(err) {
-                    this.stopVisual();
-                }
-            } else {
-                this.stopVisual();
-            }
-        };
-    },
-    
-    toggle() {
-        if (this.isRecording) {
-            this.isRecording = false;
-            this.recognition.stop();
-            this.stopVisual();
-        } else {
-            const input = document.getElementById(this.inputId);
-            if (input) input.value = '';  // Очищаем поле перед записью
-            this.isRecording = true;
-            this.startVisual();
+        voiceBtn.addEventListener('click', () => {
+            console.log('🎤 Запуск голосового ввода...');
             try {
-                this.recognition.start();
-            } catch(err) {
-                console.error('❌ Ошибка запуска:', err);
+                recognition.start();
+                voiceBtn.textContent = '🎤 Слушаю...';
+                voiceBtn.disabled = true;
+            } catch (e) {
+                console.error('❌ Ошибка запуска:', e);
+                voiceBtn.textContent = '🎤 Голосовой ввод';
+                voiceBtn.disabled = false;
             }
-        }
-    },
-    
-    startVisual() {
-        const btn = document.getElementById('voiceBtn');
-        if (btn) {
-            btn.classList.add('recording');
-            btn.innerHTML = '⏹ Нажмите для остановки';
-        }
-    },
-    
-    stopVisual() {
-        const btn = document.getElementById('voiceBtn');
-        if (btn) {
-            btn.classList.remove('recording');
-            btn.innerHTML = '🎤 Голосовой ввод';
-        }
+        });
+        
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            console.log('🎤 Распознано:', transcript);
+            
+            if (ingredientsInput) {
+                const currentValue = ingredientsInput.value;
+                if (currentValue) {
+                    ingredientsInput.value = currentValue + ', ' + transcript;
+                } else {
+                    ingredientsInput.value = transcript;
+                }
+            }
+            
+            voiceBtn.textContent = '🎤 Голосовой ввод';
+            voiceBtn.disabled = false;
+        };
+        
+        recognition.onerror = (event) => {
+            console.error('❌ Ошибка голосового ввода:', event.error);
+            voiceBtn.textContent = '🎤 Голосовой ввод';
+            voiceBtn.disabled = false;
+        };
+        
+        recognition.onend = () => {
+            console.log('🎤 Запись завершена');
+            voiceBtn.textContent = '🎤 Голосовой ввод';
+            voiceBtn.disabled = false;
+        };
+        
+        console.log('✅ Голосовой ввод готов');
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => VoiceInput.init('voiceBtn', 'ingredients'));
+// Инициализация при загрузке
+document.addEventListener('DOMContentLoaded', () => {
+    VoiceInput.init();
+});
+
+console.log('✅ Модуль voice.js загружен');
