@@ -11,15 +11,8 @@ window.App = {
         const searchBtn = document.getElementById('searchBtn');
         if (searchBtn) {
             searchBtn.addEventListener('click', () => {
-                console.log('🔍 Кнопка поиска нажата');
+                console.log('🔍 Поиск...');
                 this.search();
-            });
-        }
-        
-        const voiceBtn = document.getElementById('voiceBtn');
-        if (voiceBtn) {
-            voiceBtn.addEventListener('click', () => {
-                console.log('🎤 Голосовой ввод');
             });
         }
     },
@@ -46,20 +39,15 @@ window.App = {
         const excludeInput = document.getElementById('excludeInput');
         const resultsDiv = document.getElementById('results');
         
-        if (!ingredientsInput) {
-            console.error('❌ Не найдено поле ingredientsInput');
-            return;
-        }
-        
-        if (!resultsDiv) {
-            console.error('❌ Не найден блок results');
+        if (!ingredientsInput || !resultsDiv) {
+            console.error('❌ Не найдены элементы');
             return;
         }
         
         const ingredients = ingredientsInput.value;
         
         if (!ingredients || ingredients.trim() === '') {
-            resultsDiv.innerHTML = '<div class="empty-message">😕 Введите ингредиенты для поиска</div>';
+            resultsDiv.innerHTML = '<div class="empty-message">😕 Введите ингредиенты</div>';
             return;
         }
         
@@ -73,19 +61,18 @@ window.App = {
         
         console.log('🔍 Ингредиенты:', ingredients);
         console.log('🔍 Фильтры:', filters);
-        console.log('🔍 Всего рецептов в базе:', window.RECIPES.length);
         
         if (!window.RECIPES || window.RECIPES.length === 0) {
-            resultsDiv.innerHTML = '<div class="empty-message">⚠️ Рецепты ещё не загрузились. Подождите несколько секунд и попробуйте снова.</div>';
+            resultsDiv.innerHTML = '<div class="empty-message">⚠️ Рецепты ещё не загрузились</div>';
             return;
         }
         
         const results = Search.find(ingredients, filters);
         
-        console.log('✅ Найдено рецептов:', results.length);
+        console.log('✅ Найдено:', results.length);
         
         if (!results || results.length === 0) {
-            resultsDiv.innerHTML = '<div class="empty-message">😕 Рецепты не найдены. Попробуйте добавить больше продуктов или расширить фильтры.</div>';
+            resultsDiv.innerHTML = '<div class="empty-message">😕 Рецепты не найдены</div>';
             return;
         }
         
@@ -99,19 +86,16 @@ window.App = {
             html += '<div class="recipe-card">';
             html += '<h3>' + (recipe.name || 'Без названия') + '</h3>';
             
-            if (recipe.image && recipe.image !== '') {
-                html += '<img src="' + recipe.image + '" alt="' + recipe.name + '">';
+            // Показываем картинку только если она есть
+            if (recipe.image && recipe.image.trim() !== '' && recipe.image.includes('http')) {
+                html += '<img src="' + recipe.image + '" alt="' + recipe.name + '" style="max-width: 300px; border-radius: 8px; margin: 10px 0;">';
             }
             
-            html += '<p><strong>⏱️ Время приготовления:</strong> ' + (recipe.time || 30) + ' мин</p>';
-            html += '<p><strong>🌍 Кухня:</strong> ' + (recipe.cuisine || 'universal') + '</p>';
-            
-            if (recipe.ingredients && recipe.ingredients.length > 0) {
-                html += '<p><strong>🥗 Ингредиенты:</strong> ' + recipe.ingredients.join(', ') + '</p>';
-            }
+            html += '<p><strong>⏱️ Время:</strong> ' + (recipe.time || 30) + ' мин</p>';
+            html += '<p><strong>🥗 Ингредиенты:</strong> ' + (recipe.ingredients || []).join(', ') + '</p>';
             
             if (recipe.instructions && recipe.instructions.length > 0) {
-                html += '<p><strong>👨‍ Как готовить:</strong> ' + recipe.instructions.join('; ') + '</p>';
+                html += '<p><strong>👨‍🍳 Инструкции:</strong> ' + recipe.instructions.join('; ') + '</p>';
             }
             
             if (recipe.matchPercent !== undefined) {
@@ -122,7 +106,7 @@ window.App = {
         }
         
         if (results.length > 20) {
-            html += '<p style="text-align: center; color: #718096; font-size: 18px; margin-top: 20px;">Показано первых 20 рецептов из ' + results.length + '</p>';
+            html += '<p style="text-align: center; color: #718096; font-size: 18px; margin-top: 20px;">Показано первых 20 из ' + results.length + '</p>';
         }
         
         resultsDiv.innerHTML = html;
@@ -133,9 +117,8 @@ window.App = {
     }
 };
 
-// Запуск при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('📄 DOM загружен, запускаем приложение...');
+    console.log('📄 DOM загружен');
     window.App.init();
 });
 
