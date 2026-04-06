@@ -76,11 +76,10 @@ window.App = {
             return;
         }
         
+        // Показываем ВСЕ рецепты (без ограничения!)
         let html = '<h2>🎉 Найдено рецептов: ' + results.length + '</h2>';
         
-        const displayCount = Math.min(results.length, 20);
-        
-        for (let i = 0; i < displayCount; i++) {
+        for (let i = 0; i < results.length; i++) {
             const recipe = results[i];
             
             html += '<div class="recipe-card">';
@@ -91,11 +90,12 @@ window.App = {
                 html += '<img src="' + recipe.image + '" alt="' + recipe.name + '" style="max-width: 300px; border-radius: 8px; margin: 10px 0;">';
             }
             
-            html += '<p><strong>⏱️ Время:</strong> ' + (recipe.time || 30) + ' мин</p>';
+            html += '<p><strong>⏱️ Время приготовления:</strong> ' + (recipe.time || 30) + ' мин</p>';
+            html += '<p><strong>🌍 Кухня:</strong> ' + (recipe.cuisine || 'универсальная') + '</p>';
             html += '<p><strong>🥗 Ингредиенты:</strong> ' + (recipe.ingredients || []).join(', ') + '</p>';
             
             if (recipe.instructions && recipe.instructions.length > 0) {
-                html += '<p><strong>👨‍🍳 Инструкции:</strong> ' + recipe.instructions.join('; ') + '</p>';
+                html += '<p><strong>👨‍🍳 Как готовить:</strong> ' + recipe.instructions.join('; ') + '</p>';
             }
             
             if (recipe.matchPercent !== undefined) {
@@ -103,10 +103,6 @@ window.App = {
             }
             
             html += '</div>';
-        }
-        
-        if (results.length > 20) {
-            html += '<p style="text-align: center; color: #718096; font-size: 18px; margin-top: 20px;">Показано первых 20 из ' + results.length + '</p>';
         }
         
         resultsDiv.innerHTML = html;
