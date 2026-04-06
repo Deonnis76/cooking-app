@@ -1,4 +1,4 @@
-// 🚀 Основное приложение (глобальный объект)
+// 🚀 Основное приложение
 
 window.App = {
     init() {
@@ -10,7 +10,10 @@ window.App = {
     setupEventListeners() {
         const searchBtn = document.getElementById('searchBtn');
         if (searchBtn) {
-            searchBtn.addEventListener('click', () => this.search());
+            searchBtn.addEventListener('click', () => {
+                console.log('🔍 Кнопка поиска нажата');
+                this.search();
+            });
         }
     },
     
@@ -18,19 +21,22 @@ window.App = {
         console.log('🔄 Загрузка рецептов...');
         const success = await loadRecipesFromCloud();
         
-        if (!success) {
+        if (success) {
+            console.log('✅ Рецепты загружены:', window.RECIPES.length);
+        } else {
             console.warn('⚠️ Рецепты не загружены');
         }
     },
     
     search() {
-        console.log('🔍 Поиск рецептов...');
+        console.log('🔍 Начинаем поиск...');
         
         const ingredientsInput = document.getElementById('ingredientsInput');
         const forWhomFilter = document.getElementById('forWhomFilter');
         const dietTypeFilter = document.getElementById('dietTypeFilter');
         const cuisineFilter = document.getElementById('cuisineFilter');
         const timeFilter = document.getElementById('timeFilter');
+        const excludeInput = document.getElementById('excludeInput');
         const resultsDiv = document.getElementById('results');
         
         if (!ingredientsInput || !resultsDiv) {
@@ -50,32 +56,45 @@ window.App = {
             dietType: dietTypeFilter ? dietTypeFilter.value : 'all',
             cuisine: cuisineFilter ? cuisineFilter.value : 'all',
             maxTime: timeFilter ? parseInt(timeFilter.value) : 999,
-            exclude: ''
+            exclude: excludeInput ? excludeInput.value : ''
         };
         
+        console.log('🔍 Ингредиенты:', ingredients);
+        console.log('🔍 Фильтры:', filters);
+        
         const results = Search.find(ingredients, filters);
+        
+        console.log('✅ Найдено рецептов:', results.length);
         
         if (results.length === 0) {
             resultsDiv.innerHTML = '<p class="empty-message">😕 Рецепты не найдены. Попробуйте добавить больше продуктов или расширить фильтры.</p>';
             return;
         }
         
-        let html = `<h2>️ Найдено рецептов: ${results.length}</h2>`;
+        let html = '<h2>🎉 Найдено рецептов: ' + results.length + '</h2>';
         
-        results.forEach(recipe => {
-            html += `
-                <div class="recipe-card">
-                    <h3>${recipe.name}</h3>
-                    <p><strong>⏱️ Время:</strong> ${recipe.time} мин</p>
-                    <p><strong> Кухня:</strong> ${recipe.cuisine}</p>
-                    <p><strong>🥗 Ингредиенты:</strong> ${recipe.ingredients.join(', ')}</p>
-                    <p><strong>‍🍳 Инструкции:</strong> ${recipe.instructions.join('; ')}</p>
-                    <p><strong>✅ Совпадение:</strong> ${Math.round(recipe.matchPercent)}%</p>
-                </div>
-            `;
+        results.slice(0, 20).forEach(recipe => {
+            html += '<div class="recipe-card">';
+            html += '<h3>' + recipe.name + '</h3>';
+            
+            if (recipe.image) {
+                html += '<img src="' + recipe.image + '" alt="' + recipe.name + '" style="max-width: 300px; border-radius: 8px;">';
+            }
+            
+            html += '<p><strong>⏱️ Время:</strong> ' + recipe.time + ' мин</p>';
+            html += '<p><strong>🌍 Кухня:</strong> ' + recipe.cuisine + '</p>';
+            html += '<p><strong>🥗 Ингредиенты:</strong> ' + recipe.ingredients.join(', ') + '</p>';
+            
+            if (recipe.instructions && recipe.instructions.length > 0) {
+                html += '<p><strong>👨‍🍳 Инструкции:</strong> ' + recipe.instructions.join('; ') + '</p>';
+            }
+            
+            html += '<p><strong>✅ Совпадение:</strong> ' + Math.round(recipe.matchPercent) + '%</p>';
+            html += '</div>';
         });
         
         resultsDiv.innerHTML = html;
+        resultsDiv.scrollIntoView({ behavior: 'smooth' });
     }
 };
 
