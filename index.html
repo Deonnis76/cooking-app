@@ -8,14 +8,22 @@
 </head>
 <body>
     <div class="container">
-        <h1>🍳 Кулинарный помощник</h1>
-        
+        <div class="header">
+            <h1> Кулинарный помощник</h1>
+        </div>
+
         <div class="search-section">
             <h2>🥕 Какие продукты у вас есть?</h2>
-            <textarea id="ingredientsInput" placeholder="Например: курица, рис, морковь, лук..."></textarea>
+            <textarea id="ingredientsInput" placeholder="Например: курица, рис, морковь, лук, перец..."></textarea>
             
-            <div class="filters">
-                <div class="filter-group">
+            <button class="voice-btn" id="voiceBtn">🎤 Голосовой ввод</button>
+        </div>
+
+        <div class="filters-section">
+            <h2>👤 Для кого готовим?</h2>
+            
+            <div class="filters-grid">
+                <div class="filter-item">
                     <label>Категория</label>
                     <select id="forWhomFilter">
                         <option value="all">Любая</option>
@@ -24,8 +32,8 @@
                         <option value="adults">Для взрослых</option>
                     </select>
                 </div>
-                
-                <div class="filter-group">
+
+                <div class="filter-item">
                     <label>Тип питания</label>
                     <select id="dietTypeFilter">
                         <option value="all">Любой</option>
@@ -33,40 +41,50 @@
                         <option value="vegetarian">Вегетарианское</option>
                         <option value="vegan">Веганское</option>
                         <option value="fish">Рыбное</option>
+                        <option value="light">Лёгкое/диетическое</option>
                     </select>
                 </div>
-                
-                <div class="filter-group">
+
+                <div class="filter-item">
                     <label>Кухня мира</label>
                     <select id="cuisineFilter">
-                        <option value="all">Любая</option>
+                        <option value="all">Любая кухня</option>
                         <option value="russian">Русская</option>
                         <option value="italian">Итальянская</option>
                         <option value="asian">Азиатская</option>
+                        <option value="european">Европейская</option>
+                        <option value="american">Американская</option>
                     </select>
                 </div>
-                
-                <div class="filter-group">
-                    <label>Время</label>
+
+                <div class="filter-item">
+                    <label>Максимум времени</label>
                     <select id="timeFilter">
-                        <option value="999">Любое</option>
-                        <option value="30">До 30 мин</option>
+                        <option value="999">Любое время</option>
+                        <option value="20">До 20 минут</option>
+                        <option value="40">До 40 минут</option>
                         <option value="60">До 1 часа</option>
                         <option value="90">До 1.5 часов</option>
                     </select>
                 </div>
             </div>
-            
-            <button id="searchBtn" class="search-button">🔍 Найти рецепты</button>
         </div>
-        
+
+        <div class="exclude-section">
+            <h2>⚠️ Исключить (аллергии, не люблю)</h2>
+            <textarea id="excludeInput" placeholder="Например: грибы, орехи, лук, чеснок..."></textarea>
+        </div>
+
+        <button class="search-button" id="searchBtn">🔍 Найти рецепты</button>
+
         <div id="results" class="results"></div>
     </div>
-    
-    <!-- Подключаем скрипты (ВАЖНО: порядок!) -->
+
+    <!-- Скрипты -->
     <script src="js/config.js"></script>
     <script src="js/recipes.js"></script>
     <script src="js/search.js"></script>
+    <script src="js/voice.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
