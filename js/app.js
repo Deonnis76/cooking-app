@@ -76,7 +76,6 @@ window.App = {
             return;
         }
         
-        // Показываем ВСЕ рецепты (без ограничения!)
         let html = '<h2>🎉 Найдено рецептов: ' + results.length + '</h2>';
         
         for (let i = 0; i < results.length; i++) {
@@ -85,7 +84,6 @@ window.App = {
             html += '<div class="recipe-card">';
             html += '<h3>' + (recipe.name || 'Без названия') + '</h3>';
             
-            // Показываем картинку только если она есть
             if (recipe.image && recipe.image.trim() !== '' && recipe.image.includes('http')) {
                 html += '<img src="' + recipe.image + '" alt="' + recipe.name + '" style="max-width: 300px; border-radius: 8px; margin: 10px 0;">';
             }
@@ -98,9 +96,7 @@ window.App = {
                 html += '<p><strong>👨‍🍳 Как готовить:</strong> ' + recipe.instructions.join('; ') + '</p>';
             }
             
-            if (recipe.matchPercent !== undefined) {
-                html += '<p><strong>✅ Совпадение:</strong> ' + Math.round(recipe.matchPercent) + '%</p>';
-            }
+            // УБРАЛ процент совпадения!
             
             html += '</div>';
         }
@@ -118,4 +114,4 @@ document.addEventListener('DOMContentLoaded', () => {
     window.App.init();
 });
 
-console.log('✅ Модуль app.js загружен');
+console.log('✅ app.js загружен');
