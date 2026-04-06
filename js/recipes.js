@@ -1,4 +1,4 @@
-// 📦 Модуль загрузки рецептов
+// 📦 Загрузка рецептов
 
 window.RECIPES = window.RECIPES || [];
 
@@ -20,7 +20,7 @@ async function loadRecipesFromCloud() {
         
         window.RECIPES = [];
         
-        // Массив случайных картинок для еды
+        // Красивые картинки для еды
         const foodImages = [
             'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400',
             'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=400',
@@ -29,11 +29,7 @@ async function loadRecipesFromCloud() {
             'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400',
             'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=400',
             'https://images.unsplash.com/photo-1547592166-23ac45744acd?w=400',
-            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400',
-            'https://images.unsplash.com/photo-1484723091739-30a097e8f929?w=400',
-            'https://images.unsplash.com/photo-1476224203421-9ac39bcb3327?w=400',
-            'https://images.unsplash.com/photo-1432139555190-58524dae6a55?w=400',
-            'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=400'
+            'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400'
         ];
         
         for (let i = 1; i < lines.length; i++) {
@@ -49,15 +45,23 @@ async function loadRecipesFromCloud() {
                 const id = parts[0].trim();
                 const name = parts[1].trim();
                 const time = parseInt(parts[2]) || 30;
-                let image = parts[3].trim();
                 
-                // Если картинка пустая или невалидная - берем случайную
-                if (!image || image === '' || !image.includes('http')) {
-                    // Берем случайную картинку на основе ID рецепта
+                // Картинка из столбца D (индекс 3)
+                let image = '';
+                if (parts.length > 3) {
+                    image = parts[3].trim();
+                    if (!image.includes('http')) {
+                        image = '';
+                    }
+                }
+                
+                // Если картинки нет - берем случайную
+                if (!image) {
                     const randomIndex = (parseInt(id) || i) % foodImages.length;
                     image = foodImages[randomIndex];
                 }
                 
+                // Ингредиенты и инструкции (начинаем с индекса 4)
                 const ingredients = [];
                 const instructions = [];
                 
