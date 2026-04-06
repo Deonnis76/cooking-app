@@ -1,56 +1,59 @@
-// 📦 Загрузка рецептов (для таблицы с множеством столбцов)
+// 📦 Загрузка рецептов (исправленный парсер)
 
 let RECIPES = [];
 
 async function loadRecipesFromCloud() {
     try {
-        console.log('🔄 Загрузка рецептов...');
+        console.log('🔄 Загрузка...');
         
         const response = await fetch(CONFIG.googleSheetUrl);
-        if (!response.ok) throw new Error('HTTP error: ' + response.status);
-        
         const text = await response.text();
         const lines = text.split('\n').filter(l => l.trim());
         
         const recipes = [];
         
-        // Пропускаем заголовки (строки 1 и 5)
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
-            if (!line || line.startsWith('id,')) continue;
+            if (!line || line.startsWith('id')) continue;
             
             const parts = line.split(',');
             
-            if (parts.length >= 10) {
-                // Собираем ингредиенты из столбцов H до второго с конца
+            // Новый формат: id,name,time,url,instruction1,instruction2...
+            if (parts.length >= 5) {
+                // Собираем все инструкции (начинаются с цифр и точки)
+                const instructions = [];
                 const ingredients = [];
-                for (let j = 7; j < parts.length - 1; j++) {
-                    if (parts[j] && parts[j].trim()) {
-                        ingredients.push(parts[j].trim());
+                
+                for (let j = 4; j < parts.length; j++) {
+                    const part = parts[j].trim();
+                    if (part.match(/^\d+\./)) {
+                        // Это инструкция (начинается с "1." "2." и т.д.)
+                        instructions.push(part);
+                    } else if (part && part.length > 2) {
+                        // Это ингредиент
+                        ingredients.push(part);
                     }
                 }
-                
-                // Последний столбец - инструкции
-                const instructions = parts[parts.length - 1] || '';
                 
                 const recipe = {
                     id: parseInt(parts[0]) || i,
                     name: parts[1] || 'Без названия',
                     time: parseInt(parts[2]) || 30,
                     image: parts[3] || '',
-                    cuisine: parts[4] || 'universal',
-                    dietType: parts[5] || 'meat',
-                    forWhom: (parts[6] || 'family').split('|'),
+                    cuisine: 'universal',
+                    dietType: 'meat',
+                    forWhom: ['family'],
                     ingredients: ingredients,
                     instructions: instructions
                 };
                 
                 recipes.push(recipe);
+                console.log('✅ Рецепт:', recipe.name, '| Ингредиентов:', ingredients.length);
             }
         }
         
         RECIPES = recipes;
-        console.log('✅ Загружено рецептов:', RECIPES.length);
+        console.log('✅✅✅ ВСЕГО РЕЦЕПТОВ:', RECIPES.length);
         return RECIPES.length > 0;
         
     } catch (e) {
